@@ -50,6 +50,32 @@ def decomp_one_combination_polynomial_naive(n,p):
     return elementary.from_polynomial(poly)
 
 
+def reduce_varible_decomposition(n,var_decomp):
+    #Takes a symmetric decomposotion with an extra variable and converts it into a decomposition in a
+    # new set of variables. In particular given a decomposition of q(t,x_1,x_2,..,x_n) of the form
+    # sum(t^i * d_i(x_1,...,x_n) and returns a decomposition of q in t,x_1 ... x_n
+    pass
+
+
+def linear_variable_elementary_extention(n,i):
+    # returns a decomposition of the elementary symmetric polynomial e_i(t+x_1,...,t+x_n) as a polynomial in t
+    # in particular it returns sum(t^i * d_i(x_1,...,x_n))
+    pass
+
+
+def linear_variable_decomosition_extention(n,decomp):
+    #Takes a symmetric decomposition in of a polynomial q n variable x_1, .., ,x_n and
+    # returns a decomposition of the polynomial q(t+x_1,...,t+x_n) as a polynomial in t
+    # in particular it returns sum(t^i * d_i(x_1,...,x_n))
+    pass
+
+
+def decompose_combination_polynomial(n,p):
+    #Decomoses the combination polynomial. This polynomial has roots x_{i_1}+ ..+x_{i_p} for some combination
+    # 1<=i_1<..<i_p<=n
+    pass
+
+
 def decomp_one_combination_polynomial(n,p):
     #Current version do naive way.
     return decomp_one_combination_polynomial_naive(n,p)
