@@ -38,8 +38,8 @@ def exterior_power(n,p):
     return chern
 
 
-def decomp_one_combination_polynomial(n,p):
-    #Current version do naive way compute the polynomial explicitly and decompose it
+def decomp_one_combination_polynomial_naive(n,p):
+    #Compute elementary symmetric decomposition the naive way compute the polynomial explicitly and decompose it
     # Using the inbuilt symmetric functions methods
     poly_ring = PolynomialRing(RationalField(),'x',n) # A ring with enough generators to work in.
     #Construct polynomial
@@ -48,6 +48,11 @@ def decomp_one_combination_polynomial(n,p):
     #Get elementary symmetric decomposition
     elementary = SymmetricFunctions(RationalField()).elementary()
     return elementary.from_polynomial(poly)
+
+
+def decomp_one_combination_polynomial(n,p):
+    #Current version do naive way.
+    return decomp_one_combination_polynomial_naive(n,p)
 
 if __name__=="__main__":
     print(exterior_power(4,2)) #Basic check
