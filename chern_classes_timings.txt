@@ -1,0 +1,31 @@
+Timings for some of the functions in chern classes
+
+Timings of naive computations of exterior powers. Values given on my laptop
+very rough to compute the order of this algorithm to compare to imporved version
+
+Computed for te first 4 p values (where available)
+
+(n,p)    --  timing
+(1,1)    --  0.000876
+(2,1)    --  0.00111
+(2,2)    --  0.000870
+(3,1)    --  0.00144
+(3,2)    --  0.00214
+(3,3)    --  0.000891
+(4,1)    --  0.00198
+(4,2)    --  0.00871
+(4,3)    --  0.00457
+(4,4)    --  0.00102
+(5,1)    --  0.00273
+(5,2)    --  0.0665
+(5,3)    --  0.118
+(5,4)    --  0.0114
+(6,1)    --  0.00520
+(6,2)    --  1.16
+(6,3)    --  22.9
+(6,4)    --  3.67
+(7,1)    --  0.0207
+(7,2)    --  72.7
+(7,3)    --  DNF
+(7,4)    --  DNF
+
