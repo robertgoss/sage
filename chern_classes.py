@@ -76,9 +76,23 @@ def decompose_combination_polynomial(n,p):
     pass
 
 
+def decomp_one_combination_polynomial_recursive(n,p):
+    #Compute a decomposition of the one combination polynomial by finding a decomposition
+    # of the associated composition polynomial doing a linear variable extension and setting
+    # the new variable equal to 1.
+    #This has the advantage of being able to use a more efficient recursive algorithm to compute
+    # a decomposition of the combination polynomial.
+    comb_decomp = decompose_combination_polynomial(n,p)
+    var_comb_decomp = linear_variable_decomosition_extention(n,comb_decomp)
+    #Set the new variable equal to one
+    new_var = var_comb_decomp.gens()[0]
+    one = var_comb_decomp.parent().one()
+    decomp = var_comb_decomp.substitute({new_var : one})
+    return decomp
+
 def decomp_one_combination_polynomial(n,p):
     #Current version do naive way.
-    return decomp_one_combination_polynomial_naive(n,p)
+    return decomp_one_combination_polynomial_recursive(n,p)
 
 if __name__=="__main__":
     print(exterior_power(4,2)) #Basic check
