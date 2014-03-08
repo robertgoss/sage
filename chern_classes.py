@@ -70,10 +70,40 @@ def linear_variable_decomosition_extention(n,decomp):
     pass
 
 
+_combination_polynomial_cache = {}
+
 def decompose_combination_polynomial(n,p):
     #Decomoses the combination polynomial. This polynomial has roots x_{i_1}+ ..+x_{i_p} for some combination
     # 1<=i_1<..<i_p<=n
-    pass
+    #We perform this computation recursively based on the following note the combination polynomial of order p
+    # q_p(x_1,...,x_n) can be split into the product of q_p(x_1,...,x_{n-1}) and the linear extension with the variable
+    # x_n of the polynomial q_{p-1}(x_1,...,x_{n-1})
+    #As this algorithm is recursive we cache results to improve efficiency
+    if (n,p) in _combination_polynomial_cache:
+        return _combination_polynomial_cache[(n,p)]
+    #If p=0,1,n then we know the decomposition and just return that
+    if p==0:
+        #In the case that p==0 return the empty decomposition
+        return SymmetricFunctions(RationalField()).elementary()[0]
+    if p==1:
+        #In the case that p==1 the decomposition is just e_1
+        return SymmetricFunctions(RationalField()).elementary()[1]
+    if p==n:
+        #In the case that p==n the decomposition is just e_n
+        return SymmetricFunctions(RationalField()).elementary()[n]
+    #Compute the decomposition of the 2 parts corresponding to the roots containing x_n and those not.
+    tail_roots = decompose_combination_polynomial(n-1,p)
+    initial_part = decompose_combination_polynomial(n-1,p-1)
+    initial_roots = linear_variable_decomosition_extention(initial_part)
+    #Recombine to get the decomposition of q_n
+    #Coerce initial_roots and tail roots into the same ring and multiply
+    one = initial_roots.one()
+    full_decomp = initial_roots * (one * tail_roots)
+    #Recobine to remove extra variable
+    decomp = reduce_varible_decomposition(n,full_decomp)
+    #Add decomp to cache
+    _combination_polynomial_cache[(n,p)] = decomp
+    return decomp
 
 
 def decomp_one_combination_polynomial_recursive(n,p):
