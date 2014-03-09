@@ -29,3 +29,17 @@ Computed for te first 4 p values (where available)
 (7,3)    --  DNF
 (7,4)    --  DNF
 
+
+Timings of more advanced recursive algorithm computation - done in order may effect with caching redo!
+
+(1,1)    --  0.00199
+(2,1)    --  0.00269
+(2,2)    --  0.00199
+(3,1)    --  0.00359
+(3,2)    --  0.00486
+(3,3)    --  0.00212
+(4,1)    --  0.00419
+(4,2)    --  0.0222
+(5,1)    --  0.00489
+(5,2)    --  0.127
+(5,3)    --  
