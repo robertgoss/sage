@@ -50,11 +50,36 @@ def decomp_one_combination_polynomial_naive(n,p):
     return elementary.from_polynomial(poly)
 
 
-def reduce_varible_decomposition(n,var_decomp):
+def reduce_variable_decomposition(n,var_decomp):
     #Takes a symmetric decomposotion with an extra variable and converts it into a decomposition in a
     # new set of variables. In particular given a decomposition of q(t,x_1,x_2,..,x_n) of the form
     # sum(t^i * d_i(x_1,...,x_n) and returns a decomposition of q in t,x_1 ... x_n
-    pass
+
+    #Use the relation that e_i(x_1,...,x_n) = t.e_{i-1}(x_1...x_{n-1}) + e_i(x_1,..,x_{n-1})
+    # under the relation t -> x_n
+    #New polynmial ring to work in
+    var_poly_ring = var_decomp.parent()
+    reduced_poly_ring = PolynomialRing(RationalField(),'x',n)
+    #Perform reduction working up to the highest exponent of t
+    degree = var_decomp.degree()
+    t = var_poly_ring.gens()[0]
+    reduced_decomp = reduced_poly_ring.zero()
+    for i in xrange(degree):
+        coefficient = var_decomp[i]
+        #The t divisible part associated to this and the element in the reduced ring
+        reduced_part = reduced_poly_ring.zero()
+        t_divisible_part = var_poly_ring.zero()
+        for support in coefficient:
+            #degree of the t divisible part of this monomial
+            t_degree = t**(i+len(support))
+            reduced_support = [(i-1) for i in support]
+            coeff = coefficient.coefficient(support)
+            t_divisible_part += coeff * t_degree * e[reduced_support]
+            reduced_part += coeff * e[reduced_support]
+        #Reduce the var decomp
+        var_decomp -= coefficient+t_divisible_part
+        #Add reduced part to the reduced decomp
+        reduced_decomp += reduced_part
 
 _elementary_linear_extension_cache = {}
 
@@ -131,7 +156,7 @@ def decompose_combination_polynomial(n,p):
     one = initial_roots.one()
     full_decomp = initial_roots * (one * tail_roots)
     #Recobine to remove extra variable
-    decomp = reduce_varible_decomposition(n,full_decomp)
+    decomp = reduce_variable_decomposition(n,full_decomp)
     #Add decomp to cache
     _combination_polynomial_cache[(n,p)] = decomp
     return decomp
