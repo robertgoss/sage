@@ -38,6 +38,15 @@ def exterior_power(n,p):
     return chern
 
 
+def clean_higher_terms(decomp,n):
+    #Removes all the terms in decomp with a support containing e_i with i>n
+    # if computing over n variables then such a e_i must be zero
+    cleaned_decomp = decomp.parent().zero()
+    for support in decomp.support():
+        if len(support)==0 or max(support) <= n:
+            cleaned_decomp += decomp.coefficient(support) * decomp.parent()[support]
+    return cleaned_decomp
+
 def decomp_one_combination_polynomial_naive(n,p):
     #Compute elementary symmetric decomposition the naive way compute the polynomial explicitly and decompose it
     # Using the inbuilt symmetric functions methods
@@ -47,7 +56,7 @@ def decomp_one_combination_polynomial_naive(n,p):
     poly = prod(roots,poly_ring.one())
     #Get elementary symmetric decomposition
     elementary = SymmetricFunctions(RationalField()).elementary()
-    return elementary.from_polynomial(poly)
+    return clean_higher_terms(elementary.from_polynomial(poly),n)
 
 
 def degree_shift(decomp,degree):
@@ -109,7 +118,7 @@ def reduce_variable_decomposition(n,var_decomp):
         reduced_decomp += shifted_coefficient*(elementary[n]**degree)
         #Increase degree for next iteration
         degree += 1
-    return reduced_decomp
+    return clean_higher_terms(reduced_decomp,n)
 
 _elementary_linear_extension_cache = {}
 
@@ -133,8 +142,9 @@ def linear_variable_elementary_extension(n,i):
         coefficient = (mon_number*binomial(i, j))/binomial(n, j)
         extension += coefficient*monomial
     #Write to cache and return
-    _elementary_linear_extension_cache[(n,i)] = extension
-    return extension
+    cleaned_extension = extension.map_coefficients(lambda x:clean_higher_terms(x,n))
+    _elementary_linear_extension_cache[(n,i)] = cleaned_extension
+    return cleaned_extension
 
 
 def linear_variable_decomposition_extension(n, decomp):
@@ -153,7 +163,8 @@ def linear_variable_decomposition_extension(n, decomp):
             monomial *= linear_variable_elementary_extension(n,index)
         coefficient = decomp.coefficient(support)
         extension += coefficient * monomial
-    return extension
+    cleaned_extension = extension.map_coefficients(lambda x:clean_higher_terms(x,n))
+    return cleaned_extension
 
 
 _combination_polynomial_cache = {}
@@ -189,7 +200,15 @@ def decompose_combination_polynomial(n,p):
     decomp = reduce_variable_decomposition(n,full_decomp)
     #Add decomp to cache
     _combination_polynomial_cache[(n,p)] = decomp
-    return decomp
+    return clean_higher_terms(decomp,n)
+
+
+def decompose_combination_polynomial_naive(n,p):
+    poly_ring = PolynomialRing(RationalField(),'x',n)
+    elementary = SymmetricFunctions(RationalField()).elementary()
+    poly = prod([sum(c) for c in Combinations(poly_ring.gens(),p)],poly_ring.one())
+    decomp = elementary.from_polynomial(poly)
+    return clean_higher_terms(decomp,n)
 
 
 def decomp_one_combination_polynomial_recursive(n,p):
