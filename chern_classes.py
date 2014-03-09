@@ -142,11 +142,11 @@ def decompose_combination_polynomial(n,p):
         #In the case that p==0 return the empty decomposition
         return SymmetricFunctions(RationalField()).elementary()[0]
     if p==1:
-        #In the case that p==1 the decomposition is just e_1
-        return SymmetricFunctions(RationalField()).elementary()[1]
-    if p==n:
-        #In the case that p==n the decomposition is just e_n
+        #In the case that p==1 the decomposition is just e_n
         return SymmetricFunctions(RationalField()).elementary()[n]
+    if p==n:
+        #In the case that p==n the decomposition is just e_1
+        return SymmetricFunctions(RationalField()).elementary()[1]
     #Compute the decomposition of the 2 parts corresponding to the roots containing x_n and those not.
     tail_roots = decompose_combination_polynomial(n-1,p)
     initial_part = decompose_combination_polynomial(n-1,p-1)
