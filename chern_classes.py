@@ -82,12 +82,23 @@ def linear_variable_elementary_extension(n,i):
     return extension
 
 
-
-def linear_variable_decomosition_extension(n,decomp):
+def linear_variable_decomposition_extension(n, decomp):
     #Takes a symmetric decomposition in of a polynomial q n variable x_1, .., ,x_n and
     # returns a decomposition of the polynomial q(t+x_1,...,t+x_n) as a polynomial in t
     # in particular it returns sum(t^i * d_i(x_1,...,x_n))
-    pass
+
+    #Construct the polynomial ring in a single variable t over the elementary symmetric algebra
+    elementary = SymmetricFunctions(RationalField()).elementary()
+    poly_ring = PolynomialRing(elementary, 't')
+    #Ideally here we would use a hom but it is not well supported so fold over the monomials in decomp
+    extension = poly_ring.zero()
+    for support in decomp.support():
+        monomial = poly_ring.one()
+        for index in support:
+            monomial *= linear_variable_elementary_extension(n,index)
+        coefficient = decomp.coefficient(support)
+        extension += coefficient * monomial
+    return extension
 
 
 _combination_polynomial_cache = {}
