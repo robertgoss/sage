@@ -80,6 +80,7 @@ def reduce_variable_decomposition(n,var_decomp):
         var_decomp -= coefficient+t_divisible_part
         #Add reduced part to the reduced decomp
         reduced_decomp += reduced_part
+    return reduced_decomp
 
 _elementary_linear_extension_cache = {}
 
