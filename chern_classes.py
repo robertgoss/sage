@@ -125,7 +125,7 @@ def decompose_combination_polynomial(n,p):
     #Compute the decomposition of the 2 parts corresponding to the roots containing x_n and those not.
     tail_roots = decompose_combination_polynomial(n-1,p)
     initial_part = decompose_combination_polynomial(n-1,p-1)
-    initial_roots = linear_variable_decomosition_extention(initial_part)
+    initial_roots = linear_variable_decomposition_extension(initial_part)
     #Recombine to get the decomposition of q_n
     #Coerce initial_roots and tail roots into the same ring and multiply
     one = initial_roots.one()
@@ -144,7 +144,7 @@ def decomp_one_combination_polynomial_recursive(n,p):
     #This has the advantage of being able to use a more efficient recursive algorithm to compute
     # a decomposition of the combination polynomial.
     comb_decomp = decompose_combination_polynomial(n,p)
-    var_comb_decomp = linear_variable_decomosition_extention(n,comb_decomp)
+    var_comb_decomp = linear_variable_decomposition_extension(n,comb_decomp)
     #Set the new variable equal to one
     new_var = var_comb_decomp.gens()[0]
     one = var_comb_decomp.parent().one()
