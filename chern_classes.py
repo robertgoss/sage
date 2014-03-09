@@ -171,7 +171,7 @@ def decomp_one_combination_polynomial_recursive(n,p):
     comb_decomp = decompose_combination_polynomial(n,p)
     var_comb_decomp = linear_variable_decomposition_extension(n,comb_decomp)
     #Set the new variable equal to one
-    new_var = var_comb_decomp.gens()[0]
+    new_var = var_comb_decomp.parent().gens()[0]
     one = var_comb_decomp.parent().one()
     decomp = var_comb_decomp.substitute({new_var : one})
     return decomp
@@ -180,5 +180,5 @@ def decomp_one_combination_polynomial(n,p):
     #Current version do naive way.
     return decomp_one_combination_polynomial_recursive(n,p)
 
-if __name__=="__main__":
-    print(exterior_power(4,2)) #Basic check
+#if __name__=="__main__":
+#    print(exterior_power(4,2)) #Basic check
