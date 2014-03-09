@@ -153,7 +153,7 @@ def decompose_combination_polynomial(n,p):
     initial_roots = linear_variable_decomposition_extension(n-1,initial_part)
     #Recombine to get the decomposition of q_n
     #Coerce initial_roots and tail roots into the same ring and multiply
-    one = initial_roots.one()
+    one = initial_roots.parent().one()
     full_decomp = initial_roots * (one * tail_roots)
     #Recobine to remove extra variable
     decomp = reduce_variable_decomposition(n,full_decomp)
