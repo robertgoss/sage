@@ -97,8 +97,8 @@ def linear_variable_elementary_extension(n,i):
     #constuct as a sum of monomials in t
     extension = poly_ring.zero()
     mon_number = binomial(n, i) # number of monomials in e_i
-    for j in xrange(n+1):
-        monomial = (t**j) * elementary[n-j]
+    for j in xrange(i+1):
+        monomial = (t**j) * elementary[i-j]
         #Number of monomials times number created at grade j / number in each e_j
         coefficient = (mon_number*binomial(i, j))/binomial(n, j)
         extension += coefficient*monomial
