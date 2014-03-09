@@ -56,14 +56,34 @@ def reduce_varible_decomposition(n,var_decomp):
     # sum(t^i * d_i(x_1,...,x_n) and returns a decomposition of q in t,x_1 ... x_n
     pass
 
+_elementary_linear_extension_cache = {}
 
-def linear_variable_elementary_extention(n,i):
+
+def linear_variable_elementary_extension(n,i):
     # returns a decomposition of the elementary symmetric polynomial e_i(t+x_1,...,t+x_n) as a polynomial in t
     # in particular it returns sum(t^i * d_i(x_1,...,x_n))
-    pass
+    #Use cache to save time as may be called often with same arguments
+    if (n,i) in _elementary_linear_extension_cache:
+        return _elementary_linear_extension_cache[(n,i)]
+    #Construct the polynomial ring in a single variable t over the elementary symmetric algebra
+    elementary = SymmetricFunctions(RationalField()).elementary()
+    poly_ring = PolynomialRing(elementary,'t')
+    t = poly_ring.gens()[0]
+    #constuct as a sum of monomials in t
+    extension = poly_ring.zero()
+    mon_number = binomial(n, i) # number of monomials in e_i
+    for j in xrange(n+1):
+        monomial = (t**j) * e[n-j]
+        #Number of monomials times number created at grade j / number in each e_j
+        coefficient = (mon_number*binomial(i, j))/binomial(n, j)
+        extension += coefficient*monomial
+    #Write to cache and return
+    _elementary_linear_extension_cache[(n,i)] = extension
+    return extension
 
 
-def linear_variable_decomosition_extention(n,decomp):
+
+def linear_variable_decomosition_extension(n,decomp):
     #Takes a symmetric decomposition in of a polynomial q n variable x_1, .., ,x_n and
     # returns a decomposition of the polynomial q(t+x_1,...,t+x_n) as a polynomial in t
     # in particular it returns sum(t^i * d_i(x_1,...,x_n))
