@@ -69,7 +69,7 @@ def reduce_variable_decomposition(n,var_decomp):
         #The t divisible part associated to this and the element in the reduced ring
         reduced_part = elementary.zero()
         t_divisible_part = var_poly_ring.zero()
-        for support in coefficient:
+        for support in coefficient.support():
             #degree of the t divisible part of this monomial
             t_degree = t**(i+len(support))
             reduced_support = [(i-1) for i in support]
