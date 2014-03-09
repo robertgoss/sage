@@ -50,6 +50,40 @@ def decomp_one_combination_polynomial_naive(n,p):
     return elementary.from_polynomial(poly)
 
 
+def degree_shift(decomp,degree):
+    #Shift all elementary polynomials in decomposition by given degree
+    shifted_decomp = decomp.parent().zero()
+    for support in decomp.support():
+        coefficient = decomp.coefficient(support)
+        shifted_support = support[degree:]
+        monomial = decomp.parent()[shifted_support]
+        shifted_decomp += coefficient * monomial
+    return shifted_decomp
+
+
+def variable_unique_expansion_elementary(n,i,poly_ring):
+    #Given an elementary symmetric polynomial in n variables gives the unique polynomial in a new variable t
+    # such that the constant part is the ith symmetric polynomial and the polynomial is symmetric in the
+    # variables t,x1,..,xn
+    t = poly_ring.gens()[0]
+    e = poly_ring.base_ring()
+    return e[i] + t*e[i-1]
+
+
+def variable_unique_expansion_decomposition(n,decomp,poly_ring):
+    #Given an elementary symmetric polynomial decomposition in n variables gives the shifted by degree
+    # unique polynomial in a new variable t such that the constant part is the given decomposition
+    # and the polynomial is a symmetric decomposition in the variables t,x1,..,xn
+    expansion = poly_ring.zero()
+    for support in decomp.support():
+        coefficient = decomp.coefficient(support)
+        monomial = poly_ring.one()
+        for el in support:
+            monomial *= variable_unique_expansion_elementary(n, el, poly_ring)
+        expansion += coefficient*monomial
+    return expansion
+
+
 def reduce_variable_decomposition(n,var_decomp):
     #Takes a symmetric decomposotion with an extra variable and converts it into a decomposition in a
     # new set of variables. In particular given a decomposition of q(t,x_1,x_2,..,x_n) of the form
@@ -58,28 +92,23 @@ def reduce_variable_decomposition(n,var_decomp):
     #Use the relation that e_i(x_1,...,x_n) = t.e_{i-1}(x_1...x_{n-1}) + e_i(x_1,..,x_{n-1})
     # under the relation t -> x_n
     #New polynmial ring to work in
+
+    #From lowest degree of variable t to the highest reduce decomp by the unique expansion of this coeffieicent
     var_poly_ring = var_decomp.parent()
-    elementary = SymmetricFunctions(RationalField()).elementary()
-    #Perform reduction working up to the highest exponent of t
-    degree = var_decomp.degree()
     t = var_poly_ring.gens()[0]
-    reduced_decomp = elementary.zero()
-    for i in xrange(degree):
-        coefficient = var_decomp[i]
-        #The t divisible part associated to this and the element in the reduced ring
-        reduced_part = elementary.zero()
-        t_divisible_part = var_poly_ring.zero()
-        for support in coefficient.support():
-            #degree of the t divisible part of this monomial
-            t_degree = t**(i+len(support))
-            reduced_support = [(i-1) for i in support]
-            coeff = coefficient.coefficient(support)
-            t_divisible_part += coeff * t_degree * elementary[reduced_support]
-            reduced_part += coeff * elementary[reduced_support]
-        #Reduce the var decomp
-        var_decomp -= coefficient+t_divisible_part
-        #Add reduced part to the reduced decomp
-        reduced_decomp += reduced_part
+    elementary = var_poly_ring.base_ring()
+    degree = 0  # current lowest degree
+    reduced_decomp = elementary.zero() # current reduced decomposition
+    while not var_decomp.is_zero():
+        coefficient = var_decomp[degree]
+        shifted_coefficient = degree_shift(coefficient,degree)
+        unique_expand = variable_unique_expansion_decomposition(n,shifted_coefficient,var_poly_ring)
+        #Reduce the variable decomposition by the expansion shifted to the required degree
+        # add this level to th reduced decomposition shifted to the required degree
+        var_decomp -= unique_expand*(t**degree)*(elementary[n-1]**degree)
+        reduced_decomp += shifted_coefficient*(elementary[n]**degree)
+        #Increase degree for next iteration
+        degree += 1
     return reduced_decomp
 
 _elementary_linear_extension_cache = {}
