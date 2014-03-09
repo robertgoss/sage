@@ -174,6 +174,8 @@ def decomp_one_combination_polynomial_recursive(n,p):
     new_var = var_comb_decomp.parent().gens()[0]
     one = var_comb_decomp.parent().one()
     decomp = var_comb_decomp.substitute({new_var : one})
+    #Need to coerce decomp back into the elementary ring
+    decomp = decomp.constant_coefficient()
     return decomp
 
 def decomp_one_combination_polynomial(n,p):
