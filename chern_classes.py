@@ -150,7 +150,7 @@ def decompose_combination_polynomial(n,p):
     #Compute the decomposition of the 2 parts corresponding to the roots containing x_n and those not.
     tail_roots = decompose_combination_polynomial(n-1,p)
     initial_part = decompose_combination_polynomial(n-1,p-1)
-    initial_roots = linear_variable_decomposition_extension(initial_part)
+    initial_roots = linear_variable_decomposition_extension(n-1,initial_part)
     #Recombine to get the decomposition of q_n
     #Coerce initial_roots and tail roots into the same ring and multiply
     one = initial_roots.one()
