@@ -59,23 +59,23 @@ def reduce_variable_decomposition(n,var_decomp):
     # under the relation t -> x_n
     #New polynmial ring to work in
     var_poly_ring = var_decomp.parent()
-    reduced_poly_ring = PolynomialRing(RationalField(),'x',n)
+    elementary = SymmetricFunctions(RationalField()).elementary()
     #Perform reduction working up to the highest exponent of t
     degree = var_decomp.degree()
     t = var_poly_ring.gens()[0]
-    reduced_decomp = reduced_poly_ring.zero()
+    reduced_decomp = elementary.zero()
     for i in xrange(degree):
         coefficient = var_decomp[i]
         #The t divisible part associated to this and the element in the reduced ring
-        reduced_part = reduced_poly_ring.zero()
+        reduced_part = elementary.zero()
         t_divisible_part = var_poly_ring.zero()
         for support in coefficient:
             #degree of the t divisible part of this monomial
             t_degree = t**(i+len(support))
             reduced_support = [(i-1) for i in support]
             coeff = coefficient.coefficient(support)
-            t_divisible_part += coeff * t_degree * e[reduced_support]
-            reduced_part += coeff * e[reduced_support]
+            t_divisible_part += coeff * t_degree * elementary[reduced_support]
+            reduced_part += coeff * elementary[reduced_support]
         #Reduce the var decomp
         var_decomp -= coefficient+t_divisible_part
         #Add reduced part to the reduced decomp
