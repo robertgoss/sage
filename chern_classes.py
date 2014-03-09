@@ -138,8 +138,10 @@ def linear_variable_elementary_extension(n,i):
     mon_number = binomial(n, i) # number of monomials in e_i
     for j in xrange(i+1):
         monomial = (t**j) * elementary[i-j]
-        #Number of monomials times number created at grade j / number in each e_j
-        coefficient = (mon_number*binomial(i, j))/binomial(n, j)
+        #Number of monomials look at number of monomials x_1 ... x_{i-j}
+        # number of x_1 ... x_{i-j} in expansion of a monomial of e_i
+        # * number of monomials in e_i containing x_1...x_{i-j}
+        coefficient = binomial(n-i+j,j)
         extension += coefficient*monomial
     #Write to cache and return
     cleaned_extension = extension.map_coefficients(lambda x:clean_higher_terms(x,n))
@@ -195,10 +197,14 @@ def decompose_combination_polynomial(n,p):
     tail_roots = decompose_combination_polynomial(n-1,p)
     initial_part = decompose_combination_polynomial(n-1,p-1)
     initial_roots = linear_variable_decomposition_extension(n-1,initial_part)
+    print n,p
+    print "Tail Roots",tail_roots
+    print "Initial Roots",initial_roots
     #Recombine to get the decomposition of q_n
     #Coerce initial_roots and tail roots into the same ring and multiply
     one = initial_roots.parent().one()
     full_decomp = initial_roots * (one * tail_roots)
+    print "Full decomp",full_decomp
     #Recobine to remove extra variable
     decomp = reduce_variable_decomposition(n,full_decomp)
     #Add decomp to cache
