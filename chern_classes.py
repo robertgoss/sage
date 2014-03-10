@@ -78,6 +78,24 @@ def variable_unique_expansion_elementary(n,i,poly_ring):
     e = poly_ring.base_ring()
     return e[i] + t*e[i-1]
 
+#Add cache to reduce multiplication burden
+_monomial_unique_extension_cache = {}
+
+def variable_unique_expansion_monomial(n,support,poly_ring):
+    #Given a monomial symmetric polynomial decomposition in n variables gives the shifted by degree
+    # unique polynomial in a new variable t such that the constant part is the given decomposition
+    # and the polynomial is a symmetric decomposition in the variables t,x1,..,xn
+    frozen_support = tuple(support)
+    if frozen_support in _monomial_unique_extension_cache:
+        return _monomial_unique_extension_cache[frozen_support]
+    if support==[]:
+        return poly_ring.one()
+    tail = variable_unique_expansion_monomial(n,support[1:],poly_ring)
+    head = variable_unique_expansion_elementary(n,support[0],poly_ring)
+    monomial = head*tail
+    _monomial_unique_extension_cache[frozen_support] = monomial
+    return monomial
+
 
 def variable_unique_expansion_decomposition(n,decomp,poly_ring):
     #Given an elementary symmetric polynomial decomposition in n variables gives the shifted by degree
@@ -86,9 +104,7 @@ def variable_unique_expansion_decomposition(n,decomp,poly_ring):
     expansion = poly_ring.zero()
     for support in decomp.support():
         coefficient = decomp.coefficient(support)
-        monomial = poly_ring.one()
-        for el in support:
-            monomial *= variable_unique_expansion_elementary(n, el, poly_ring)
+        monomial = variable_unique_expansion_monomial(n,support,poly_ring)
         expansion += coefficient*monomial
     return expansion
 
