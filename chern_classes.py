@@ -244,5 +244,5 @@ def decomp_one_combination_polynomial(n,p):
     #Current version do naive way.
     return decomp_one_combination_polynomial_recursive(n,p)
 
-#if __name__=="__main__":
-#    print(exterior_power(4,2)) #Basic check
+if __name__=="__main__":
+    print(exterior_power(4,2)) #Basic check
