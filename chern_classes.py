@@ -197,10 +197,18 @@ def decompose_combination_polynomial(n,p):
     tail_roots = decompose_combination_polynomial(n-1,p)
     initial_part = decompose_combination_polynomial(n-1,p-1)
     initial_roots = linear_variable_decomposition_extension(n-1,initial_part)
+    #Renormalize as adding the extra variable is split as n-1 parts
+    normalized_roots = initial_roots.parent().zero()
+    t = initial_roots.parent().gens()[0]
+    elementary = initial_roots.base_ring()
+    for i in xrange(initial_roots.degree()+1):
+        coefficient = initial_roots[i]
+        exponent = t * (1/(p-1)*elementary[[]])
+        normalized_roots += coefficient*(exponent**i)
     #Recombine to get the decomposition of q_n
     #Coerce initial_roots and tail roots into the same ring and multiply
-    one = initial_roots.parent().one()
-    full_decomp = initial_roots * (one * tail_roots)
+    one = normalized_roots.parent().one()
+    full_decomp = normalized_roots * (one * tail_roots)
     #Recobine to remove extra variable
     decomp = reduce_variable_decomposition(n,full_decomp)
     #Add decomp to cache
