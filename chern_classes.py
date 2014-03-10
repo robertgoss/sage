@@ -232,10 +232,10 @@ def decomp_one_combination_polynomial_recursive(n,p):
     # a decomposition of the combination polynomial.
     comb_decomp = decompose_combination_polynomial(n,p)
     var_comb_decomp = linear_variable_decomposition_extension(n,comb_decomp)
-    #Set the new variable equal to one
+    #Set the new variable equal to 1/p
     new_var = var_comb_decomp.parent().gens()[0]
-    one = var_comb_decomp.parent().one()
-    decomp = var_comb_decomp.substitute({new_var : one})
+    scale = var_comb_decomp.parent().one() * (1/p) * var_comb_decomp.parent().base_ring()[[]]
+    decomp = var_comb_decomp.substitute({new_var : scale})
     #Need to coerce decomp back into the elementary ring
     decomp = decomp.constant_coefficient()
     return decomp
