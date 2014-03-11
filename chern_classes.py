@@ -58,7 +58,7 @@ def filter_by_degree(decomp,degree):
             filtered_decomp += decomp.coefficient(support) * decomp.parent()[support]
     return filtered_decomp
 
-def decomp_one_combination_polynomial_naive(n,p,degree=None):
+def decomp_one_combination_polynomial_naive(n,p,degree):
     #Compute elementary symmetric decomposition the naive way compute the polynomial explicitly and decompose it
     # Using the inbuilt symmetric functions methods
     poly_ring = PolynomialRing(RationalField(),'x',n) # A ring with enough generators to work in.
@@ -187,36 +187,31 @@ def linear_variable_decomposition_extension(n, decomp):
 #Cache of previous smaller results to improve recursion
 _combination_polynomial_cache = {}
 
-def decompose_one_combination_polynomial_recursive(n,p,degree=None):
+def decompose_one_combination_polynomial_recursive(n,p,degree):
     #We perform this computation recursively based on the following note the combination polynomial of order p
     # q_p(x_1,...,x_n) can be split into the product of q_p(x_1,...,x_{n-1}) and the linear extension with the variable
     # x_n of the polynomial q_{p-1}(x_1,...,x_{n-1})
 
-    #If degree is present filter the decomposition to just return components of degree less than that
-    if degree:
-        decomp = decompose_one_combination_polynomial_recursive(n,p)
-        return filter_by_degree(decomp,degree)
-
     #See if required data is in the cache
-    if (n,p,degree) in _combination_polynomial_cache:
-        return _combination_polynomial_cache[(n,p,degree)]
+    if (n, p, degree) in _combination_polynomial_cache:
+        return _combination_polynomial_cache[(n, p, degree)]
     #Elementary symmetric function algebra
     elementary = SymmetricFunctions(RationalField()).elementary()
     #Give results for base cases
     if p>n:
         #If p > n then the polynomial is trivial
-        return elementary.zero()
+        return filter_by_degree(elementary.zero())
     if p==0:
         #If p==0 then the polynomial == 1
-        return elementary[[]]
+        return filter_by_degree(elementary[[]])
     if p==1:
         #If p==1 then this is the defining polynmoial of the elementary symmetric polynomials
         #If degree is specified only return part with needed degree
         elem_sum = [elementary[i] for i in xrange(n+1)]
-        return sum(elem_sum)
+        return filter_by_degree(sum(elem_sum),degree)
     if p==n:
         #If p==n then only one combination is possible and q_n = 1+e_1
-        return elementary[[0]]+elementary[[1]]
+        return filter_by_degree(elementary[[0]]+elementary[[1]],degree)
     #Else recurse and get the decompositions of initial and tail roots
     #Get the full decomposition for now in the head and tail.
     tail_roots = decompose_one_combination_polynomial_recursive(n-1,p)
@@ -233,8 +228,10 @@ def decompose_one_combination_polynomial_recursive(n,p,degree=None):
     full_decomp = normalized_roots * tail_roots
     #Remove extra variable to get a decomposition n terms of x_1,..,x_n
     decomp = reduce_variable_decomposition(n,full_decomp)
+    #Reduce degree
+    decomp = filter_by_degree(decomp,degree)
     #Add to cache and return
-    _combination_polynomial_cache[(n,p)] = decomp
+    _combination_polynomial_cache[(n, p, degree)] = decomp
     return decomp
 
 
@@ -242,10 +239,14 @@ def decompose_one_combination_polynomial(n,p,algorithm="recursive",degree=None):
     #Optional algorithm property gives the algorithm used to decompose polynomial of line bundles
     # Naive corresponds to computing the full polynomial mostly used for testing
     #If positive degree is given only return the part of the decomposition less than that degree.
+
+    #Default to a degree which returns everything.
+    if degree:
+        degree = binomial(n,p)+1
     if algorithm=="naive":
         return decomp_one_combination_polynomial_naive(n,p,degree)
     #Default to using recursive algorithm
-    return decompose_one_combination_polynomial_recursive(n,p,degree)
+    return decompose_one_combination_polynomial_recursive(n, p, degree)
 
 #if __name__=="__main__":
     #print(exterior_power(4,2)) #Basic check
