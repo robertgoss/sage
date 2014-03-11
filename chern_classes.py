@@ -11,9 +11,11 @@ def prod(list,initial):
 #File to help compute chern classes and relations between that come up in my academic work
 
 
-def exterior_power(n,p):
+def exterior_power(n,p,algorithm="recursive"):
     #Returns the chern class of the pth exterior power of an n dimensional bundle E
     # in terms of the chern class of E
+    #Optional algorithm property gives the algorithm used to decompose polynomial of line bundles
+    # Naive corresponds to computing the full polynomial mostly used for testing
 
     #Polynomial ring of polynomials in the chern classes.
     chern_ring = PolynomialRing(RationalField(),'c',n+1) # N+1 gens as c_0 is 1 to get the dimensions to agree.
@@ -21,7 +23,7 @@ def exterior_power(n,p):
     # symmetric polynomials of the polynomial which is the product of
     # (1+x_{i_1}+...x_{i_p}) for each combination of 1<=i_1<..<i_p<=n.
     # We call such a polynomial a one combination polynomial in p and n.
-    decomp = decomp_one_combination_polynomial(n,p)
+    decomp = decompose_one_combination_polynomial(n,p,algorithm)
     #Convert the decomposition into a polynomial in the chern classes.
     chern = chern_ring.zero()
     chern_gens = chern_ring.gens()
@@ -169,80 +171,60 @@ def linear_variable_decomposition_extension(n, decomp):
     return cleaned_extension
 
 
+#Cache of previous smaller results to improve recursion
 _combination_polynomial_cache = {}
 
-def decompose_combination_polynomial(n,p):
-    #Decomoses the combination polynomial. This polynomial has roots x_{i_1}+ ..+x_{i_p} for some combination
-    # 1<=i_1<..<i_p<=n
+def decompose_one_combination_polynomial_recursive(n,p):
     #We perform this computation recursively based on the following note the combination polynomial of order p
     # q_p(x_1,...,x_n) can be split into the product of q_p(x_1,...,x_{n-1}) and the linear extension with the variable
     # x_n of the polynomial q_{p-1}(x_1,...,x_{n-1})
-    #As this algorithm is recursive we cache results to improve efficiency
+
+    #See if required data is in the cache
     if (n,p) in _combination_polynomial_cache:
         return _combination_polynomial_cache[(n,p)]
-    #If p=0,1,n then we know the decomposition and just return that
+    #Elementary symmetric function algebra
+    elementary = SymmetricFunctions(RationalField()).elementary()
+    #Give results for base cases
+    if p>n:
+        #If p > n then the polynomial is trivial
+        return elementary.zero()
     if p==0:
-        #In the case that p==0 return the empty decomposition
-        return SymmetricFunctions(RationalField()).elementary()[0]
+        #If p==0 then the polynomial == 1
+        return elementary[[]]
     if p==1:
-        #In the case that p==1 the decomposition is just e_n
-        return SymmetricFunctions(RationalField()).elementary()[n]
+        #If p==1 then this is the defining polynmoial of the elementary symmetric polynomials
+        elem_sum = [elementary[i] for i in xrange(n+1)]
+        return sum(elem_sum)
     if p==n:
-        #In the case that p==n the decomposition is just e_1
-        return SymmetricFunctions(RationalField()).elementary()[1]
-    #If p<0 or p>n then we are out of range and return zero
-    if p<0 or p>n:
-        return SymmetricFunctions(RationalField()).elementary().zero()
-    #Compute the decomposition of the 2 parts corresponding to the roots containing x_n and those not.
-    tail_roots = decompose_combination_polynomial(n-1,p)
-    initial_part = decompose_combination_polynomial(n-1,p-1)
+        #If p==n then only one combination is possible and q_n = 1+e_1
+        return elementary[[0]]+elementary[[1]]
+    #Else recurse and geet the decompositions of initial and tail roots
+    tail_roots = decompose_one_combination_polynomial_recursive(n-1,p)
+    initial_part = decompose_one_combination_polynomial_recursive(n-1,p-1)
     initial_roots = linear_variable_decomposition_extension(n-1,initial_part)
-    #Renormalize as adding the extra variable is split as n-1 parts
+    #Renormalize as the extra variable is split between p-1 variables
     normalized_roots = initial_roots.parent().zero()
     t = initial_roots.parent().gens()[0]
-    elementary = initial_roots.base_ring()
     for i in xrange(initial_roots.degree()+1):
         coefficient = initial_roots[i]
         exponent = t * (1/(p-1)*elementary[[]])
         normalized_roots += coefficient*(exponent**i)
-    #Recombine to get the decomposition of q_n
-    #Coerce initial_roots and tail roots into the same ring and multiply
-    one = normalized_roots.parent().one()
-    full_decomp = normalized_roots * (one * tail_roots)
-    #Recobine to remove extra variable
+    #Recombine to get a decomposition of q_n
+    full_decomp = normalized_roots * tail_roots
+    #Remove extra variable to get a decomposition n terms of x_1,..,x_n
     decomp = reduce_variable_decomposition(n,full_decomp)
-    #Add decomp to cache
+    #Add to cahce and return
     _combination_polynomial_cache[(n,p)] = decomp
-    return clean_higher_terms(decomp,n)
-
-
-def decompose_combination_polynomial_naive(n,p):
-    poly_ring = PolynomialRing(RationalField(),'x',n)
-    elementary = SymmetricFunctions(RationalField()).elementary()
-    poly = prod([sum(c) for c in Combinations(poly_ring.gens(),p)],poly_ring.one())
-    decomp = elementary.from_polynomial(poly)
-    return clean_higher_terms(decomp,n)
-
-
-def decomp_one_combination_polynomial_recursive(n,p):
-    #Compute a decomposition of the one combination polynomial by finding a decomposition
-    # of the associated composition polynomial doing a linear variable extension and setting
-    # the new variable equal to 1.
-    #This has the advantage of being able to use a more efficient recursive algorithm to compute
-    # a decomposition of the combination polynomial.
-    comb_decomp = decompose_combination_polynomial(n,p)
-    var_comb_decomp = linear_variable_decomposition_extension(n,comb_decomp)
-    #Set the new variable equal to 1/p
-    new_var = var_comb_decomp.parent().gens()[0]
-    scale = var_comb_decomp.parent().one() * (1/p) * var_comb_decomp.parent().base_ring()[[]]
-    decomp = var_comb_decomp.substitute({new_var : scale})
-    #Need to coerce decomp back into the elementary ring
-    decomp = decomp.constant_coefficient()
     return decomp
 
-def decomp_one_combination_polynomial(n,p):
-    #Current version do naive way.
-    return decomp_one_combination_polynomial_recursive(n,p)
 
-if __name__=="__main__":
-    print(exterior_power(4,2)) #Basic check
+def decompose_one_combination_polynomial(n,p,algorithm="recursive"):
+    #Optional algorithm property gives the algorithm used to decompose polynomial of line bundles
+    # Naive corresponds to computing the full polynomial mostly used for testing
+    if algorithm=="naive":
+        return decomp_one_combination_polynomial_naive(n,p)
+    #Default to using recursive algorithm
+    return decompose_one_combination_polynomial_recursive(n,p)
+
+#if __name__=="__main__":
+    #print(exterior_power(4,2)) #Basic check
