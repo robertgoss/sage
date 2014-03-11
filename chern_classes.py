@@ -257,7 +257,7 @@ def decompose_one_combination_polynomial(n,p,algorithm="recursive",degree=None):
     #If positive degree is given only return the part of the decomposition less than that degree.
 
     #Default to a degree which returns everything.
-    if degree:
+    if not degree:
         degree = binomial(n,p)+1
     if algorithm=="naive":
         return decomp_one_combination_polynomial_naive(n,p,degree)
