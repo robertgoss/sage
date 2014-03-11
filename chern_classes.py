@@ -11,12 +11,12 @@ def prod(list,initial):
 #File to help compute chern classes and relations between that come up in my academic work
 
 
-def exterior_power(n,p,algorithm="recursive",degree=-1):
+def exterior_power(n,p,algorithm="recursive",degree=None):
     #Returns the chern class of the pth exterior power of an n dimensional bundle E
     # in terms of the chern class of E
     #Optional algorithm property gives the algorithm used to decompose polynomial of line bundles
     # Naive corresponds to computing the full polynomial mostly used for testing
-    #If positive degree is given just return the chern class at that degree.
+    #If positive degree is given just return the chern class less than that degree.
 
     #Polynomial ring of polynomials in the chern classes.
     chern_ring = PolynomialRing(RationalField(),'c',n+1) # N+1 gens as c_0 is 1 to get the dimensions to agree.
@@ -50,18 +50,15 @@ def clean_higher_terms(decomp,n):
             cleaned_decomp += decomp.coefficient(support) * decomp.parent()[support]
     return cleaned_decomp
 
-def filter_by_degree(decomp,degree=-1):
-    #Returns the homogenous part of the decomposition of the given positive degree where the degree of e_i is i
-    # if degree is negative does nothing
-    if degree<0:
-        return decomp
+def filter_by_degree(decomp,degree):
+    #Returns the homogenous part of the decomposition less than the given positive degree where the degree of e_i is i
     filtered_decomp = decomp.parent().zero()
     for support in decomp.support():
-        if sum(support) == degree:
+        if sum(support) < degree:
             filtered_decomp += decomp.coefficient(support) * decomp.parent()[support]
     return filtered_decomp
 
-def decomp_one_combination_polynomial_naive(n,p,degree=-1):
+def decomp_one_combination_polynomial_naive(n,p,degree=None):
     #Compute elementary symmetric decomposition the naive way compute the polynomial explicitly and decompose it
     # Using the inbuilt symmetric functions methods
     poly_ring = PolynomialRing(RationalField(),'x',n) # A ring with enough generators to work in.
@@ -71,7 +68,7 @@ def decomp_one_combination_polynomial_naive(n,p,degree=-1):
     #Get elementary symmetric decomposition
     elementary = SymmetricFunctions(RationalField()).elementary()
     decomp = clean_higher_terms(elementary.from_polynomial(poly),n)
-    if degree>=0:
+    if degree:
         #If degree is present filter the decomposition to just return that component
         decomp = filter_by_degree(decomp,degree)
     return decomp
@@ -190,10 +187,16 @@ def linear_variable_decomposition_extension(n, decomp):
 #Cache of previous smaller results to improve recursion
 _combination_polynomial_cache = {}
 
-def decompose_one_combination_polynomial_recursive(n,p,degree=-1):
+def decompose_one_combination_polynomial_recursive(n,p,degree=None):
     #We perform this computation recursively based on the following note the combination polynomial of order p
     # q_p(x_1,...,x_n) can be split into the product of q_p(x_1,...,x_{n-1}) and the linear extension with the variable
     # x_n of the polynomial q_{p-1}(x_1,...,x_{n-1})
+
+    #If degree is present filter the decomposition to just return components of degree less than that
+    if degree:
+        decomp = decompose_one_combination_polynomial_recursive(n,p)
+        return filter_by_degree(decomp,degree)
+
     #See if required data is in the cache
     if (n,p,degree) in _combination_polynomial_cache:
         return _combination_polynomial_cache[(n,p,degree)]
@@ -205,16 +208,15 @@ def decompose_one_combination_polynomial_recursive(n,p,degree=-1):
         return elementary.zero()
     if p==0:
         #If p==0 then the polynomial == 1
-        if degree<1:
-            return elementary[[]]
+        return elementary[[]]
     if p==1:
         #If p==1 then this is the defining polynmoial of the elementary symmetric polynomials
         #If degree is specified only return part with needed degree
         elem_sum = [elementary[i] for i in xrange(n+1)]
-        return filter_by_degree(sum(elem_sum),degree)
+        return sum(elem_sum)
     if p==n:
         #If p==n then only one combination is possible and q_n = 1+e_1
-        return filter_by_degree(elementary[[0]]+elementary[[1]],degree)
+        return elementary[[0]]+elementary[[1]]
     #Else recurse and get the decompositions of initial and tail roots
     #Get the full decomposition for now in the head and tail.
     tail_roots = decompose_one_combination_polynomial_recursive(n-1,p)
@@ -231,18 +233,15 @@ def decompose_one_combination_polynomial_recursive(n,p,degree=-1):
     full_decomp = normalized_roots * tail_roots
     #Remove extra variable to get a decomposition n terms of x_1,..,x_n
     decomp = reduce_variable_decomposition(n,full_decomp)
-    #If degree is present filter the decomposition to just return that component
-    if degree>=0:
-        decomp = filter_by_degree(decomp,degree)
     #Add to cache and return
-    _combination_polynomial_cache[(n,p,degree)] = decomp
+    _combination_polynomial_cache[(n,p)] = decomp
     return decomp
 
 
-def decompose_one_combination_polynomial(n,p,algorithm="recursive",degree=-1):
+def decompose_one_combination_polynomial(n,p,algorithm="recursive",degree=None):
     #Optional algorithm property gives the algorithm used to decompose polynomial of line bundles
     # Naive corresponds to computing the full polynomial mostly used for testing
-    #If positive degree is given only return the part of the decomposition of that degree.
+    #If positive degree is given only return the part of the decomposition less than that degree.
     if algorithm=="naive":
         return decomp_one_combination_polynomial_naive(n,p,degree)
     #Default to using recursive algorithm
