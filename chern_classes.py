@@ -42,7 +42,7 @@ def exterior_power(n,p,algorithm="recursive",degree=None):
 
 
 def clean_higher_terms(decomp,n):
-    #Removes all the terms in decomp with a support containing e_i with i>n
+    #Removes all the terms in decomposition with a support containing e_i with i>n
     # if computing over n variables then such a e_i must be zero
     cleaned_decomp = decomp.parent().zero()
     for support in decomp.support():
@@ -51,7 +51,7 @@ def clean_higher_terms(decomp,n):
     return cleaned_decomp
 
 def filter_by_degree(decomp,degree):
-    #Returns the homogenous part of the decomposition less than the given positive degree where the degree of e_i is i
+    #Returns the homogeneous part of the decomposition less than the given positive degree where the degree of e_i is i
     filtered_decomp = decomp.parent().zero()
     for support in decomp.support():
         if sum(support) < degree:
@@ -59,7 +59,7 @@ def filter_by_degree(decomp,degree):
     return filtered_decomp
 
 def filter_by_var_degree(var_decomp,degree):
-    #Returns the homogenous part of a polynomial decomposition less than the given positive degree
+    #Returns the homogeneous part of a polynomial decomposition less than the given positive degree
     # where the degree of e_i is i and the degree of t is 1
     poly_ring = var_decomp.parent()
     t = poly_ring.gens()[0]
@@ -121,15 +121,15 @@ def variable_unique_expansion_decomposition(n,decomp,poly_ring):
 
 
 def reduce_variable_decomposition(n,var_decomp):
-    #Takes a symmetric decomposotion with an extra variable and converts it into a decomposition in a
+    #Takes a symmetric decomposition with an extra variable and converts it into a decomposition in a
     # new set of variables. In particular given a decomposition of q(t,x_1,x_2,..,x_n) of the form
     # sum(t^i * d_i(x_1,...,x_n) and returns a decomposition of q in t,x_1 ... x_n
 
     #Use the relation that e_i(x_1,...,x_n) = t.e_{i-1}(x_1...x_{n-1}) + e_i(x_1,..,x_{n-1})
     # under the relation t -> x_n
-    #New polynmial ring to work in
+    #New polynomial ring to work in
 
-    #From lowest degree of variable t to the highest reduce decomp by the unique expansion of this coeffieicent
+    #From lowest degree of variable t to the highest reduce decomposition by the unique expansion of this coefficient
     var_poly_ring = var_decomp.parent()
     t = var_poly_ring.gens()[0]
     elementary = var_poly_ring.base_ring()
@@ -184,7 +184,7 @@ def linear_variable_decomposition_extension(n, decomp):
     #Construct the polynomial ring in a single variable t over the elementary symmetric algebra
     elementary = SymmetricFunctions(RationalField()).elementary()
     poly_ring = PolynomialRing(elementary, 't')
-    #Ideally here we would use a hom but it is not well supported so fold over the monomials in decomp
+    #Ideally here we would use a hom but it is not well supported so fold over the monomials in decomposition
     extension = poly_ring.zero()
     for support in decomp.support():
         monomial = poly_ring.one()
@@ -217,7 +217,7 @@ def decompose_one_combination_polynomial_recursive(n,p,degree):
         #If p==0 then the polynomial == 1
         return filter_by_degree(elementary[[]])
     if p==1:
-        #If p==1 then this is the defining polynmoial of the elementary symmetric polynomials
+        #If p==1 then this is the defining polynomial of the elementary symmetric polynomials
         #If degree is specified only return part with needed degree
         elem_sum = [elementary[i] for i in xrange(n+1)]
         return filter_by_degree(sum(elem_sum),degree)
@@ -236,7 +236,7 @@ def decompose_one_combination_polynomial_recursive(n,p,degree):
         coefficient = initial_roots[i]
         exponent = t * (1/(p-1)*elementary[[]])
         normalized_roots += coefficient*(exponent**i)
-    #Remove higher unneeded parts from the decomp
+    #Remove higher unneeded parts from the decomposition
     normalized_roots = filter_by_var_degree(normalized_roots,degree)
     #Recombine to get a decomposition of q_n
     full_decomp = normalized_roots * tail_roots
