@@ -226,10 +226,8 @@ def decompose_one_combination_polynomial_recursive(n,p,degree):
         return filter_by_degree(elementary[[0]]+elementary[[1]],degree)
     #Else recurse and get the decompositions of initial and tail roots
     #Get the full decomposition for now in the head and tail.
-    tail_full_degree = binomial(n-1,p)+1
-    head_full_degree = binomial(n-1,p-1)+1
-    tail_roots = decompose_one_combination_polynomial_recursive(n-1,p,tail_full_degree)
-    initial_part = decompose_one_combination_polynomial_recursive(n-1,p-1,head_full_degree)
+    tail_roots = decompose_one_combination_polynomial_recursive(n-1,p,degree)
+    initial_part = decompose_one_combination_polynomial_recursive(n-1,p-1,degree)
     initial_roots = linear_variable_decomposition_extension(n-1,initial_part)
     #Renormalize as the extra variable is split between p-1 variables
     normalized_roots = initial_roots.parent().zero()
@@ -238,11 +236,15 @@ def decompose_one_combination_polynomial_recursive(n,p,degree):
         coefficient = initial_roots[i]
         exponent = t * (1/(p-1)*elementary[[]])
         normalized_roots += coefficient*(exponent**i)
+    #Remove higher unneeded parts from the decomp
+    normalized_roots = filter_by_var_degree(normalized_roots,degree)
     #Recombine to get a decomposition of q_n
     full_decomp = normalized_roots * tail_roots
     #Remove extra variable to get a decomposition n terms of x_1,..,x_n
+    #filter to roots by degree as the reduce functions preserves degree
+    full_decomp = filter_by_var_degree(full_decomp,degree)
     decomp = reduce_variable_decomposition(n,full_decomp)
-    #Reduce degree
+    #Reduce degree - should be redundant!
     decomp = filter_by_degree(decomp,degree)
     #Add to cache and return
     _combination_polynomial_cache[(n, p, degree)] = decomp
