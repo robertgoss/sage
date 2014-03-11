@@ -58,6 +58,18 @@ def filter_by_degree(decomp,degree):
             filtered_decomp += decomp.coefficient(support) * decomp.parent()[support]
     return filtered_decomp
 
+def filter_by_var_degree(var_decomp,degree):
+    #Returns the homogenous part of a polynomial decomposition less than the given positive degree
+    # where the degree of e_i is i and the degree of t is 1
+    poly_ring = var_decomp.parent()
+    t = poly_ring.gens()[0]
+    filtered_decomp = poly_ring.zero()
+    for i in xrange(var_decomp.degree()+1):
+        if degree <= i:
+            break
+        filtered_decomp += t**i * filter_by_degree(var_decomp[i], degree-i)
+    return filtered_decomp
+
 def decomp_one_combination_polynomial_naive(n,p,degree):
     #Compute elementary symmetric decomposition the naive way compute the polynomial explicitly and decompose it
     # Using the inbuilt symmetric functions methods
