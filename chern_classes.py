@@ -214,8 +214,10 @@ def decompose_one_combination_polynomial_recursive(n,p,degree):
         return filter_by_degree(elementary[[0]]+elementary[[1]],degree)
     #Else recurse and get the decompositions of initial and tail roots
     #Get the full decomposition for now in the head and tail.
-    tail_roots = decompose_one_combination_polynomial_recursive(n-1,p)
-    initial_part = decompose_one_combination_polynomial_recursive(n-1,p-1)
+    tail_full_degree = binomial(n-1,p)+1
+    head_full_degree = binomial(n-1,p-1)+1
+    tail_roots = decompose_one_combination_polynomial_recursive(n-1,p,tail_full_degree)
+    initial_part = decompose_one_combination_polynomial_recursive(n-1,p-1,head_full_degree)
     initial_roots = linear_variable_decomposition_extension(n-1,initial_part)
     #Renormalize as the extra variable is split between p-1 variables
     normalized_roots = initial_roots.parent().zero()
