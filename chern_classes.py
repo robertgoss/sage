@@ -80,6 +80,7 @@ def variable_unique_expansion_elementary(n,i,poly_ring):
 
 #Add cache to reduce multiplication burden
 _monomial_unique_extension_cache = {}
+_MONOMIAL_CACHE_LENGTH = 5 #Maximal length of sequences in cache to reduce cache size.
 
 def variable_unique_expansion_monomial(n,support,poly_ring):
     #Given a monomial symmetric polynomial decomposition in n variables gives the shifted by degree
@@ -90,10 +91,15 @@ def variable_unique_expansion_monomial(n,support,poly_ring):
         return _monomial_unique_extension_cache[frozen_support]
     if support==[]:
         return poly_ring.one()
-    tail = variable_unique_expansion_monomial(n,support[1:],poly_ring)
-    head = variable_unique_expansion_elementary(n,support[0],poly_ring)
-    monomial = head*tail
-    _monomial_unique_extension_cache[frozen_support] = monomial
+    if len(support) > _MONOMIAL_CACHE_LENGTH:
+        tail = variable_unique_expansion_monomial(n,support[_MONOMIAL_CACHE_LENGTH:],poly_ring)
+        head = variable_unique_expansion_monomial(n,support[:_MONOMIAL_CACHE_LENGTH],poly_ring)
+        monomial = head*tail
+    else:
+        head = variable_unique_expansion_elementary(n,support[0],poly_ring)
+        tail = variable_unique_expansion_monomial(n,support[1:],poly_ring)
+        monomial = head*tail
+        _monomial_unique_extension_cache[frozen_support] = monomial
     return monomial
 
 
