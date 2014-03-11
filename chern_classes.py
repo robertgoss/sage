@@ -19,7 +19,9 @@ def exterior_power(n,p,algorithm="recursive",degree=None):
     #If positive degree is given just return the chern class less than that degree.
 
     #Polynomial ring of polynomials in the chern classes.
-    chern_ring = PolynomialRing(RationalField(),'c',n+1) # N+1 gens as c_0 is 1 to get the dimensions to agree.
+    # N+1 gens as c_0 is 1 to get the dimensions to agree.
+    # deglex is used to quickly see the equal degree parts.
+    chern_ring = PolynomialRing(RationalField(),'c',n+1,order='deglex')
     #By the splitting principle this is the same as computing a decomposition into elementary
     # symmetric polynomials of the polynomial which is the product of
     # (1+x_{i_1}+...x_{i_p}) for each combination of 1<=i_1<..<i_p<=n.
