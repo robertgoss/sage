@@ -25,7 +25,7 @@ class VectorBundle:
 
         if chern_classes:
             #If the chern classes are given set dimension
-            self.dim = len(chern_classes)
+            self.dim = len(chern_classes)-1
             #Get the variables used in all the chern classes to construct a ring containing the all
             variables = set([])
             for chern_class in chern_classes:
