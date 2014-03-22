@@ -49,7 +49,7 @@ class VectorBundle:
             self.chern_classes = [self.chern_ring.one()]
             #Set the chern classes to there appropriate generator.
             for i in xrange(self.truncation):
-                self.chern_classes.append(self.chern_ring.gens(i))
+                self.chern_classes.append(self.chern_ring.gens()[i])
 
     def total_chern_class(self):
         #Returns the total chern class given as the sum of
