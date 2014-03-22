@@ -92,16 +92,24 @@ class VectorBundle:
         new_chern_ring = PolynomialRing(QQ, self.chern_ring.variable_names() + bundle.variable_names())
         #Compute new chern classes using whitney formula
         new_chern_classes = []
-        for i in xrange(self.dim + bundle.dim):
+        #If this or the other bundle is truncated only truncate the resultant bundle to the minimum of these 2
+        if self.truncated or bundle.truncated:
+            max_degree = min(self.truncation, bundle.truncation)
+        else:
+            max_degree = self.dim + bundle.dim
+        for i in xrange(max_degree):
             new_chern_class_i = new_chern_ring.zero()
             for j in xrange(i):
                 #Check that both indices are within bounds else the product is zero.
                 #Coerse with new chern ring
-                if j < self.dim and i-j < bundle.dim:
+                if j < self.truncation and i-j < bundle.truncation:
                     new_chern_class_i += (new_chern_ring.one() * self.chern_classes[j]) * bundle.chern_classes[i-j]
             new_chern_classes.append(new_chern_class_i)
-        #Return new bundle.
-        return VectorBundle(name, chern_classes=new_chern_classes)
+        #Return new bundle - with correct truncation
+        if self.truncated or bundle.truncated:
+            return VectorBundle(name, self.dim+bundle.dim, new_chern_classes, max_degree)
+        else:
+            return VectorBundle(name, self.dim+bundle.dim, new_chern_classes)
 
     def multiple(self, n, name=None):
         #Returns a Vector bundle with is the direct sum of this bundle n times
