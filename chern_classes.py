@@ -109,6 +109,7 @@ class VectorBundle:
             acc = acc.sum(self, name)
         return acc
 
+
 class LineBundle(VectorBundle):
     #Specialisation of Vector bundle to line bundles - this allows and inverse to be computed.
 
