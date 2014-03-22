@@ -34,7 +34,7 @@ class VectorBundle:
             #Multiply each chern class by 1 in the chern ring to coerce.
             self.chern_classes = [self.chern_ring.one()]
             for i in xrange(self.dim):
-                self.chern_classes.append(self.chern_ring.one() * chern_class[i])
+                self.chern_classes.append(self.chern_ring.one() * chern_class[i+1])
         else:
             #If the chern classes are not set constuct names for each of them and make the ring based on this
             self.dim = dim
