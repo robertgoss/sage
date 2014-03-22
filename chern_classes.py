@@ -56,6 +56,19 @@ class VectorBundle:
         #Returns the total chern class given as the sum of
         return sum(self.chern_classes)
 
+    def conjugate(self):
+        #Returns the conjugate bundle of this bundle
+        new_chern_classes = []
+        for i,chern in enumerate(self.chern_classes):
+            if i%2:
+                new_chern_classes.append(-chern)
+            else:
+                new_chern_classes.append(chern)
+        if self.truncated:
+            return VectorBundle(name, self.dim, new_chern_classes, self.truncation)
+        else:
+            return VectorBundle(name, self.dim, new_chern_classes)
+
     def twist(self, line_bundle, name=None):
         #Returns the Vector bundle with is the tensor product of this bundle and a complex line
         # Also give a new optional name else ne will be constructed
