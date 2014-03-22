@@ -39,7 +39,7 @@ class VectorBundle:
             self.chern_ring = PolynomialRing(QQ,list(variables))
             #Multiply each chern class by 1 in the chern ring to coerce.
             self.chern_classes = [self.chern_ring.one()]
-            for i in xrange(self.truncation):
+            for i in xrange(min(self.truncation,self.dim)):
                 self.chern_classes.append(chern_classes[i+1])
                 self.chern_classes[-1] = self.chern_classes[-1] * self.chern_ring.one()
         else:
@@ -49,15 +49,18 @@ class VectorBundle:
             self.chern_ring = PolynomialRing(QQ,variables)
             self.chern_classes = [self.chern_ring.one()]
             #Set the chern classes to there appropriate generator.
-            for i in xrange(self.truncation):
+            for i in xrange(min(self.truncation,self.dim)):
                 self.chern_classes.append(self.chern_ring.gens()[i])
 
     def total_chern_class(self):
         #Returns the total chern class given as the sum of
         return sum(self.chern_classes)
 
-    def conjugate(self):
+    def conjugate(self, name=None):
         #Returns the conjugate bundle of this bundle
+        #Takes optional name parameter
+        if not name:
+            name = self.name+"cong"
         new_chern_classes = []
         for i,chern in enumerate(self.chern_classes):
             if i%2:
@@ -82,7 +85,7 @@ class VectorBundle:
         #Compute new chern classes using binomial formula
         # -- see notes for sum formula.
         new_chern_classes = []
-        for i in xrange(self.truncation+1):
+        for i in xrange(min(self.truncation,self.dim)+1):
             new_chern_class_i = new_chern_ring.zero()
             for j in xrange(i+1):
                 new_chern_class_i += binomial(self.dim-j,i-j) * c1**(i-j) * self.chern_classes[j]
@@ -109,7 +112,7 @@ class VectorBundle:
         new_chern_classes = []
         #If this or the other bundle is truncated only truncate the resultant bundle to the minimum of these 2
         if self.truncated or bundle.truncated:
-            max_degree = min(self.truncation, bundle.truncation)
+            max_degree = min(self.truncation, bundle.truncation, self.dim, bundle.dim)
         else:
             max_degree = self.dim + bundle.dim
         for i in xrange(max_degree+1):
@@ -117,7 +120,7 @@ class VectorBundle:
             for j in xrange(i+1):
                 #Check that both indices are within bounds else the product is zero.
                 #Coerse with new chern ring
-                if j <= self.truncation and i-j <= bundle.truncation:
+                if j <= min(self.truncation, self.dim) and i-j <= min(bundle.truncation, bundle.dim):
                     new_chern_class_i += (new_chern_ring.one() * self.chern_classes[j]) * bundle.chern_classes[i-j]
             new_chern_classes.append(new_chern_class_i)
         #Return new bundle - with correct truncation
