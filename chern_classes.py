@@ -87,11 +87,24 @@ class VectorBundle:
             new_chern_class_i = new_chern_ring.zero()
             for j in xrange(i):
                 #Check that both indices are within bounds else the product is zero.
+                #Coerse with new chern ring
                 if j < self.dim and i-j < bundle.dim:
-                    new_chern_class_i += self.chern_classes[j] * bundle.chern_classes[i-j]
+                    new_chern_class_i += (new_chern_ring.one() * self.chern_classes[j]) * bundle.chern_classes[i-j]
             new_chern_classes.append(new_chern_class_i)
         #Return new bundle.
         return VectorBundle(name, chern_classes=new_chern_classes)
+
+    def multiple(self, n, name=None):
+        #Returns a Vector bundle with is the direct sum of this bundle n times
+        # Also give a new optional name else one will be constructed.
+        if not name:
+            #Use append number to front to indicate multiple by n.
+            name = str(n) + self.name
+        #Repeatly use the sum formula accumulating in this copy of self
+        acc = VectorBundle(name, chern_classes=list(self.chern_classes))
+        for _ in xrange(n-1):
+            acc = acc.sum(self, name)
+        return acc
 
 
 def exterior_power(n, p, algorithm="recursive",degree=None):
