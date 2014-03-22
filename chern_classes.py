@@ -79,7 +79,9 @@ class VectorBundle:
             #Other bundle must be a lne bundle
             return ValueError
         #Create new chern ring with all classes exist in
-        new_chern_ring = PolynomialRing(QQ, self.chern_ring.variable_names() + line_bundle.chern_ring.variable_names())
+        variables = set(self.chern_ring.variable_names_recursive())
+        variables.update(line_bundle.chern_ring.variable_names_recursive())
+        new_chern_ring = PolynomialRing(QQ, list(variables))
         #Get first chern class of line bundle coerced
         c1 = line_bundle.chern_classes[1] * new_chern_ring.one()
         #Compute new chern classes using binomial formula
@@ -107,7 +109,9 @@ class VectorBundle:
             #Use plus to indicate direct sum if new name not given
             name = self.name + 'plus' + bundle.name
         #Create new chern ring which all classes exist in
-        new_chern_ring = PolynomialRing(QQ, self.chern_ring.variable_names() + bundle.chern_ring.variable_names())
+        variables = set(self.chern_ring.variable_names_recursive())
+        variables.update(bundle.chern_ring.variable_names_recursive())
+        new_chern_ring = PolynomialRing(QQ, list(variables))
         #Compute new chern classes using whitney formula
         new_chern_classes = []
         #If this or the other bundle is truncated only truncate the resultant bundle to the minimum of these 2
@@ -121,7 +125,9 @@ class VectorBundle:
                 #Check that both indices are within bounds else the product is zero.
                 #Coerse with new chern ring
                 if j <= min(self.truncation, self.dim) and i-j <= min(bundle.truncation, bundle.dim):
-                    new_chern_class_i += (new_chern_ring.one() * self.chern_classes[j]) * bundle.chern_classes[i-j]
+                    new_self_class = self.chern_classes[j]*new_chern_ring.one()
+                    new_bundle_class = bundle.chern_classes[i-j]*new_chern_ring.one()
+                    new_chern_class_i += new_self_class * new_bundle_class
             new_chern_classes.append(new_chern_class_i)
         #Return new bundle - with correct truncation
         if self.truncated or bundle.truncated:
