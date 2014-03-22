@@ -44,7 +44,7 @@ class VectorBundle:
         else:
             #If the chern classes are not set construct names for each of them and make the ring based on this
             self.dim = dim
-            variables = ["c"+str(i+1)+"("+name+")" for i in xrange(dim)]
+            variables = ["c"+str(i+1)+name for i in xrange(dim)]
             self.chern_ring = PolynomialRing(QQ,variables)
             self.chern_classes = [self.chern_ring.one()]
             #Set the chern classes to there appropriate generator.
