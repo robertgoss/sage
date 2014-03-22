@@ -121,8 +121,11 @@ class VectorBundle:
             #Use append number to front to indicate multiple by n.
             name = str(n) + self.name
         #Repeatly use the sum formula accumulating in this copy of self
-        acc = VectorBundle(name, chern_classes=list(self.chern_classes))
-        for _ in xrange(n-1):
+        if self.truncated:
+            acc = VectorBundle(name, self.dim, self.chern_classes, self.truncation)
+        else:
+            acc = VectorBundle(name, self.dim, self.chern_classes)
+        for i in xrange(n-1):
             acc = acc.sum(self, name)
         return acc
 
