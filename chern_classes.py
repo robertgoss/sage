@@ -97,12 +97,12 @@ class VectorBundle:
             max_degree = min(self.truncation, bundle.truncation)
         else:
             max_degree = self.dim + bundle.dim
-        for i in xrange(max_degree):
+        for i in xrange(max_degree+1):
             new_chern_class_i = new_chern_ring.zero()
-            for j in xrange(i):
+            for j in xrange(i+1):
                 #Check that both indices are within bounds else the product is zero.
                 #Coerse with new chern ring
-                if j < self.truncation and i-j < bundle.truncation:
+                if j <= self.truncation and i-j <= bundle.truncation:
                     new_chern_class_i += (new_chern_ring.one() * self.chern_classes[j]) * bundle.chern_classes[i-j]
             new_chern_classes.append(new_chern_class_i)
         #Return new bundle - with correct truncation
