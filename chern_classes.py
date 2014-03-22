@@ -131,6 +131,39 @@ class VectorBundle:
             acc = acc.sum(self, name)
         return acc
 
+    def exterior_power(self, p, name=None):
+        #Returns the pth exterior power of this bundle
+        #Also takes an optional name parameter for this bundle
+        if not name:
+            name = "Ext"+str(p)+self.name
+        #By the splitting principle this is the same as computing a decomposition into elementary
+        # symmetric polynomials of the polynomial which is the product of
+        # (1+x_{i_1}+...x_{i_p}) for each combination of 1<=i_1<..<i_p<=n.
+        # We call such a polynomial a one combination polynomial in p and n.
+        if self.truncated:
+            decomp = _decompose_one_combination_polynomial(self.dim, p, 'recursive', self.truncation+1)
+            max_degree = self.truncation+1
+        else:
+            decomp = _decompose_one_combination_polynomial(self.dim, p, 'recursive')
+            max_degree = binomial(self.dim, p)+1
+        new_chern_classes = [self.chern_ring.zero() for _ in xrange(max_degree)]
+        monomial_coefficients = decomp.monomial_coefficients()
+        #Directly convert elementary symmetric monomials to monomials in chern generators
+        # Would like to do this with a hom
+        for monomial in monomial_coefficients:
+            coefficient = monomial_coefficients[monomial]
+            #As all chern classes of E are zero in degree greater than n
+            # only include those monomials containing elementary symmetric polynomials
+            # with degree less than or equal to n.
+            if all(degree <= self.dim for degree in monomial):
+                dim = sum(monomial)
+                c_monomial = prod([self.chern_classes[i] for i in monomial], self.chern_ring.one())
+                new_chern_classes[dim] += coefficient*c_monomial
+        if self.truncated:
+            return VectorBundle(name, binomial(self.dim, p), new_chern_classes, self.truncation)
+        else:
+            return VectorBundle(name, binomial(self.dim, p), new_chern_classes)
+
 
 class LineBundle(VectorBundle):
     #Specialisation of Vector bundle to line bundles - this allows and inverse to be computed.
