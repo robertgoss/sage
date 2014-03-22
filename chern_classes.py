@@ -44,7 +44,7 @@ class VectorBundle:
         else:
             #If the chern classes are not set construct names for each of them and make the ring based on this
             self.dim = dim
-            variables = ["c_"+str(i+1)+"("+name+")" for i in xrange(dim)]
+            variables = ["c"+str(i+1)+"("+name+")" for i in xrange(dim)]
             self.chern_ring = PolynomialRing(QQ,variables)
             self.chern_classes = [self.chern_ring.one()]
             #Set the chern classes to there appropriate generator.
@@ -86,8 +86,8 @@ class VectorBundle:
         #Returns the Vector bundle which is the sum of this bundle and the given bundle.
         # Also give a new optional name else one will be constructed.
         if not name:
-            #Use + to indicate direct sum if new name not given
-            name = self.name + '+' + bundle.name
+            #Use plus to indicate direct sum if new name not given
+            name = self.name + 'plus' + bundle.name
         #Create new chern ring which all classes exist in
         new_chern_ring = PolynomialRing(QQ, self.chern_ring.variable_names() + bundle.variable_names())
         #Compute new chern classes using whitney formula
@@ -146,7 +146,7 @@ class LineBundle(VectorBundle):
         #Returns the inverse of this line bundle
         #Takes an optional name to call this bundle else it will be called name_inv
         if not name:
-            name = self.name+"_inv"
+            name = self.name+"inv"
         return LineBundle(name, -self.chern_classes[1])
 
     def power(self, n, name=None):
@@ -155,9 +155,9 @@ class LineBundle(VectorBundle):
         #In the case that n == -1 this is the same as inverse.
         if not name:
             if n > 0:
-                name = self.name+'_' + str(n)
+                name = self.name+'' + str(n)
             elif n < 0:
-                name = self.name+'_inv_' + str(n)
+                name = self.name+'inv' + str(n)
             else:
                 name = '1'  # The trivial bundle
         return LineBundle(name, n*self.chern_classes[1])
