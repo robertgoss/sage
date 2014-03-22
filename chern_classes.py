@@ -71,7 +71,7 @@ class VectorBundle:
         new_chern_classes = []
         for i in xrange(self.truncation+1):
             new_chern_class_i = new_chern_ring.zero()
-            for j in xrange(i):
+            for j in xrange(i+1):
                 new_chern_class_i += binomial(self.dim-j,i-j) * c1**(i-j) * self.chern_classes[j]
             new_chern_classes.append(new_chern_class_i)
 
