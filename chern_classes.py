@@ -109,6 +109,40 @@ class VectorBundle:
             acc = acc.sum(self, name)
         return acc
 
+class LineBundle(VectorBundle):
+    #Specialisation of Vector bundle to line bundles - this allows and inverse to be computed.
+
+    def __init__(self, name, chern_class=None):
+        #Creates a ine bundle with the given name unless a chern class is given the first chern class
+        # of this bundle is the same as the name
+        self.dim = 1
+        self.name = name
+        if chern_class:
+            self.chern_ring = chern_class.parent()
+            self.chern_classes = [self.chern_ring.one(), chern_class]
+        else:
+            self.chern_ring = PolynomialRing(QQ, name)
+            self.chern_classes = [self.chern_ring.one(), self.chern_ring.gen()]
+
+    def inverse(self, name=None):
+        #Returns the inverse of this line bundle
+        #Takes an optional name to call this bundle else it will be called name_inv
+        if not name:
+            name = self.name+"_inv"
+        return LineBundle(name, -self.chern_classes[1])
+
+    def power(self, n, name=None):
+        #Returns this bundle (or it's inverse) tensored wih itself n times
+        #Takes an optional name parameter
+        #In the case that n == -1 this is the same as inverse.
+        if not name:
+            if n > 0:
+                name = self.name+'_' + str(n)
+            elif n < 0:
+                name = self.name+'_inv_' + str(n)
+            else:
+                name = '1'  # The trivial bundle
+        return LineBundle(name, n*self.chern_classes[1])
 
 def exterior_power(n, p, algorithm="recursive",degree=None):
     #Returns the chern class of the pth exterior power of an n dimensional bundle E
