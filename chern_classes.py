@@ -19,9 +19,12 @@ class VectorBundle:
         # Either give the dimension or a list of chern clases.
         # In the case of a dimension the chern classes will be abstractly set to names of the form c_i(name)
         # In the case of a list of chern classes they will be coerced into the same ring.
+
         if not dim and not chern_classes:
             #Need one of the dim or the chern classes
             raise ValueError
+
+        self.name = name
 
         if chern_classes:
             #If the chern classes are given set dimension
@@ -34,7 +37,7 @@ class VectorBundle:
             #Multiply each chern class by 1 in the chern ring to coerce.
             self.chern_classes = [self.chern_ring.one()]
             for i in xrange(self.dim):
-                self.chern_classes.append(self.chern_ring.one() * chern_class[i+1])
+                self.chern_classes.append(self.chern_ring.one() * chern_classes[i+1])
         else:
             #If the chern classes are not set constuct names for each of them and make the ring based on this
             self.dim = dim
@@ -116,14 +119,11 @@ class LineBundle(VectorBundle):
     def __init__(self, name, chern_class=None):
         #Creates a ine bundle with the given name unless a chern class is given the first chern class
         # of this bundle is the same as the name
-        self.dim = 1
-        self.name = name
         if chern_class:
-            self.chern_ring = chern_class.parent()
-            self.chern_classes = [self.chern_ring.one(), chern_class]
+            chern_classes = [chern_class.parent().one(), chern_class]
         else:
-            self.chern_ring = PolynomialRing(QQ, name)
-            self.chern_classes = [self.chern_ring.one(), self.chern_ring.gen()]
+            chern_classes = [PolynomialRing(QQ, name).one(), self.chern_ring.gen()]
+        VectorBundle.__init__(self, name, chern_classes=chern_classes)
 
     def inverse(self, name=None):
         #Returns the inverse of this line bundle
