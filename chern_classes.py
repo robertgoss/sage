@@ -97,6 +97,9 @@ class VectorBundle:
     def multiple(self, n, name=None):
         #Returns a Vector bundle with is the direct sum of this bundle n times
         # Also give a new optional name else one will be constructed.
+        if n < 1:
+            #Thi method cannot handle inverses or zero multiples.
+            raise ValueError
         if not name:
             #Use append number to front to indicate multiple by n.
             name = str(n) + self.name
