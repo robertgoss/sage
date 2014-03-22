@@ -140,7 +140,7 @@ class LineBundle(VectorBundle):
         if chern_class:
             chern_classes = [chern_class.parent().one(), chern_class]
         else:
-            chern_classes = [PolynomialRing(QQ, name).one(), self.chern_ring.gen()]
+            chern_classes = [PolynomialRing(QQ, name).one(), PolynomialRing(QQ, name).gen()]
         VectorBundle.__init__(self, name, 1, chern_classes)
 
     def inverse(self, name=None):
