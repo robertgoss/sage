@@ -89,7 +89,7 @@ class VectorBundle:
             #Use plus to indicate direct sum if new name not given
             name = self.name + 'plus' + bundle.name
         #Create new chern ring which all classes exist in
-        new_chern_ring = PolynomialRing(QQ, self.chern_ring.variable_names() + bundle.variable_names())
+        new_chern_ring = PolynomialRing(QQ, self.chern_ring.variable_names() + bundle.chern_ring.variable_names())
         #Compute new chern classes using whitney formula
         new_chern_classes = []
         #If this or the other bundle is truncated only truncate the resultant bundle to the minimum of these 2
