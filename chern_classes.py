@@ -68,7 +68,7 @@ class VectorBundle:
         #Compute new chern classes using binomial formula
         # -- see notes for sum formula.
         new_chern_classes = []
-        for i in xrange(self.dim):
+        for i in xrange(self.truncation):
             new_chern_class_i = new_chern_ring.zero()
             for j in xrange(i):
                 new_chern_class_i += binomial(self.dim-j,i-j) * c1**(i-j) * self.chern_classes[j]
@@ -77,7 +77,10 @@ class VectorBundle:
         if not name:
             #Use * to indicate tensor product if new name not given
             name = self.name + '*' + line_bundle.name
-        return VectorBundle(name, chern_classes=new_chern_classes)
+        if self.truncated:
+            return VectorBundle(name, self.dim, new_chern_classes, self.truncation)
+        else:
+            return VectorBundle(name, self.dim, new_chern_classes)
 
     def sum(self, bundle, name=None):
         #Returns the Vector bundle which is the sum of this bundle and the given bundle.
