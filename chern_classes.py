@@ -164,6 +164,9 @@ class VectorBundle:
         else:
             return VectorBundle(name, binomial(self.dim, p), new_chern_classes)
 
+    def __str__(self):
+        return "Vector bundle of dimension "+str(self.dim)
+
 
 class LineBundle(VectorBundle):
     #Specialisation of Vector bundle to line bundles - this allows and inverse to be computed.
@@ -196,6 +199,9 @@ class LineBundle(VectorBundle):
             else:
                 name = '1'  # The trivial bundle
         return LineBundle(name, n*self.chern_classes[1])
+
+    def __str__(self):
+        return "Line bundle with first chern class "+str(self.chern_classes[1])
 
 def exterior_power(n, p, algorithm="recursive",degree=None):
     #Returns the chern class of the pth exterior power of an n dimensional bundle E
