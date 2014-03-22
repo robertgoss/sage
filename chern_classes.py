@@ -63,7 +63,7 @@ class VectorBundle:
             #Other bundle must be a lne bundle
             return ValueError
         #Create new chern ring with all classes exist in
-        new_chern_ring = PolynomialRing(QQ, self.chern_ring.variable_names() + line_bundle.variable_names())
+        new_chern_ring = PolynomialRing(QQ, self.chern_ring.variable_names() + line_bundle.chern_ring.variable_names())
         #Get first chern class of line bundle coerced
         c1 = line_bundle.chern_classes[1] * new_chern_ring.one()
         #Compute new chern classes using binomial formula
