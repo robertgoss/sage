@@ -73,6 +73,27 @@ class VectorBundle:
             name = self.name + '*' + line_bundle.name
         return VectorBundle(name, chern_classes=new_chern_classes)
 
+    def sum(self, bundle, name=None):
+        #Returns the Vector bundle which is the sum of this bundle and the given bundle.
+        # Also give a new optional name else one will be constructed.
+        if not name:
+            #Use + to indicate direct sum if new name not given
+            name = self.name + '+' + bundle.name
+        #Create new chern ring which all classes exist in
+        new_chern_ring = PolynomialRing(QQ, self.chern_ring.variable_names() + bundle.variable_names())
+        #Compute new chern classes using whitney formula
+        new_chern_classes = []
+        for i in xrange(self.dim + bundle.dim):
+            new_chern_class_i = new_chern_ring.zero()
+            for j in xrange(i):
+                #Check that both indices are within bounds else the product is zero.
+                if j < self.dim and i-j < bundle.dim:
+                    new_chern_class_i += self.chern_classes[j] * bundle.chern_classes[i-j]
+            new_chern_classes.append(new_chern_class_i)
+        #Return new bundle.
+        return VectorBundle(name, chern_classes=new_chern_classes)
+
+
 def exterior_power(n, p, algorithm="recursive",degree=None):
     #Returns the chern class of the pth exterior power of an n dimensional bundle E
     # in terms of the chern class of E
