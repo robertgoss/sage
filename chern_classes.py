@@ -49,6 +49,30 @@ class VectorBundle:
         #Returns the total chern class given as the sum of
         return sum(self.chern_classes)
 
+    def twist(self, line_bundle, name=None):
+        #Returns the Vector bundle with is the tensor product of this bundle and a complex line
+        # Also give a new optional name else ne will be constructed
+        if not line_bundle.dim == 1:
+            #Other bundle must be a lne bundle
+            return ValueError
+        #Create new chern ring with all classes exist in
+        new_chern_ring = PolynomialRing(QQ, self.chern_ring.variable_names() + line_bundle.variable_names())
+        #Get first chern class of line bundle coerced
+        c1 = line_bundle.chern_classes[1] * new_chern_ring.one()
+        #Compute new chern classes using binomial formula
+        # -- see notes for sum formula.
+        new_chern_classes = []
+        for i in xrange(self.dim):
+            new_chern_class_i = new_chern_ring.zero()
+            for j in xrange(i):
+                new_chern_class_i += binomial(self.dim-j,i-j) * c1**(i-j) * self.chern_classes[j]
+            new_chern_classes.append(new_chern_class_i)
+
+        if not name:
+            #Use * to indicate tensor product if new name not given
+            name = self.name + '*' + line_bundle.name
+        return VectorBundle(name, chern_classes=new_chern_classes)
+
 def exterior_power(n, p, algorithm="recursive",degree=None):
     #Returns the chern class of the pth exterior power of an n dimensional bundle E
     # in terms of the chern class of E
