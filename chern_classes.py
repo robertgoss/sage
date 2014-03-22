@@ -11,6 +11,44 @@ def prod(list, initial):
 #File to help compute chern classes and relations between that come up in my academic work
 
 
+class VectorBundle:
+    #Class to group together chern classes of a bundle.
+    # This means that gradings can be preserved better.
+    def __init__(self, name, dim=None, chern_classes=None):
+        #Create a bundle with a given name
+        # Either give the dimension or a list of chern clases.
+        # In the case of a dimension the chern classes will be abstractly set to names of the form c_i(name)
+        # In the case of a list of chern classes they will be coerced into the same ring.
+        if not dim and not chern_classes:
+            #Need one of the dim or the chern classes
+            raise ValueError
+
+        if chern_classes:
+            #If the chern classes are given set dimension
+            self.dim = len(chern_classes)
+            #Get the variables used in all the chern classes to construct a ring containing the all
+            variables = set([])
+            for chern_class in chern_classes:
+                variables.update(chern_class.parent().variable_names_recursive())
+            self.chern_ring = PolynomialRing(QQ,list(variables))
+            #Multiply each chern class by 1 in the chern ring to coerce.
+            self.chern_classes = [self.chern_ring.one()]
+            for i in xrange(self.dim):
+                self.chern_classes.append(self.chern_ring.one() * chern_class[i])
+        else:
+            #If the chern classes are not set constuct names for each of them and make the ring based on this
+            self.dim = dim
+            variables = ["c_"+str(i+1)+"("+name+")" for i in xrange(dim)]
+            self.chern_ring = PolynomialRing(QQ,variables)
+            self.chern_classes = [self.chern_ring.one()]
+            #Set the chern classes to there appropriate generator.
+            for i in xrange(dim):
+                self.chern_classes.append(self.chern_ring.gens(i))
+
+    def total_chern_class(self):
+        #Returns the total chern class given as the sum of
+        return sum(self.chern_classes)
+
 def exterior_power(n, p, algorithm="recursive",degree=None):
     #Returns the chern class of the pth exterior power of an n dimensional bundle E
     # in terms of the chern class of E
