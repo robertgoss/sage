@@ -186,6 +186,22 @@ class VectorBundle:
         else:
             return VectorBundle(name, binomial(self.dim, p), new_chern_classes)
 
+    def tensor_square(self,name=None):
+        #Returns the tensor square of this bundle
+        #Tkes optional name for the bundle
+        if not name:
+            name = self.name + 'sqr'
+        #Use the fact that the tensor square splits (as chern classes)
+        #As the product of 2exterior powers and a middle part which is just 2*i*c_i
+        ext_bundle = self.exterior_power(2)
+        mid_classes = [c*2**i for i, c in enumerate(self.chern_classes)]
+        if self.truncated:
+            mid_bundle = VectorBundle('mid', self.dim, mid_classes, self.truncation)
+        else:
+            mid_bundle = VectorBundle('mid', self.dim, mid_classes)
+        return mid_bundle.sum(ext_bundle.multiple(2), name)
+
+
     def __str__(self):
         return "Vector bundle "+self.name+" of dimension "+str(self.dim)
 
