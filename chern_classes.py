@@ -201,6 +201,15 @@ class VectorBundle:
             mid_bundle = VectorBundle('mid', self.dim, mid_classes)
         return mid_bundle.sum(ext_bundle.multiple(2), name)
 
+    def truncate(self, truncation):
+        #Truncate the bundle by the given amount.
+        if self.truncated:
+            if truncation > self.truncation:
+                #We cannot raise the amount the bundle is truncated by
+                raise ValueError
+        self.truncated = True
+        self.truncation = truncation
+
 
     def __str__(self):
         return "Vector bundle "+self.name+" of dimension "+str(self.dim)
