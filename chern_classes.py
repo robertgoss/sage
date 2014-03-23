@@ -201,6 +201,21 @@ class VectorBundle:
             mid_bundle = VectorBundle('mid', self.dim, mid_classes)
         return mid_bundle.sum(ext_bundle.multiple(2), name)
 
+    def symmetric_square(self, name=None):
+        #Returns the symmetric square of this bundle
+        #Takes optional name for the bundle
+        if not name:
+            name = self.name + 'sqr'
+        #Use the fact that the symmetric square splits (as chern classes)
+        #As the product of exterior square and a middle part which is just 2*i*c_i
+        ext_bundle = self.exterior_power(2)
+        mid_classes = [c*2**i for i, c in enumerate(self.chern_classes)]
+        if self.truncated:
+            mid_bundle = VectorBundle('mid', self.dim, mid_classes, self.truncation)
+        else:
+            mid_bundle = VectorBundle('mid', self.dim, mid_classes)
+        return mid_bundle.sum(ext_bundle, name)
+
     def truncate(self, truncation):
         #Truncate the bundle by the given amount.
         if self.truncated:
