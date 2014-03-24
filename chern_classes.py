@@ -216,6 +216,21 @@ class VectorBundle:
             mid_bundle = VectorBundle('mid', self.dim, mid_classes)
         return mid_bundle.sum(ext_bundle, name)
 
+    def __add__(self, other):
+        #Default use the sum function to add another bundle to this
+        return self.sum(other)
+
+    def __mul__(self, other):
+        #If the other bundle is a line bundle twist this bundle by it.
+        #If this bundle is a line bundle twist the other bundle by this
+        #If neither bundle is a line bundle raise a value error
+        if other.dim == 1:
+            return self.twist(other)
+        elif self.dim == 1:
+            return other.twist(self)
+        else:
+            raise ValueError
+
     def truncate(self, truncation):
         #Truncate the bundle by the given amount.
         if self.truncated:
@@ -264,6 +279,10 @@ class LineBundle(VectorBundle):
             else:
                 name = '1'  # The trivial bundle
         return LineBundle(name, n*self.chern_classes[1])
+
+    def __pow__(self, power):
+        #Use power operator for line bundles
+        return self.power(power)
 
     def __str__(self):
         return "Line bundle "+self.name+" with first chern class "+str(self.chern_classes[1])
