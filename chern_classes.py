@@ -218,18 +218,23 @@ class VectorBundle:
 
     def __add__(self, other):
         #Default use the sum function to add another bundle to this
+        # If other can be coerced into an integer coerce it into a trivial bundle.
+        if other in ZZ:
+            return self.sum(TrivialBundle(coerce(ZZ, other)))
         return self.sum(other)
 
     def __mul__(self, other):
         #If the other bundle is a line bundle twist this bundle by it.
         #If this bundle is a line bundle twist the other bundle by this
+        #If the other bundle can be coerced to the 1 dimensional trivial bundle
         #If neither bundle is a line bundle raise a value error
         if other.dim == 1:
             return self.twist(other)
-        elif self.dim == 1:
+        if self.dim == 1:
             return other.twist(self)
-        else:
-            raise ValueError
+        if other == 1:
+            return self  # Twisting by trivial bundle does nothing
+        raise ValueError
 
     def truncate(self, truncation):
         #Truncate the bundle by the given amount.
