@@ -290,6 +290,18 @@ class LineBundle(VectorBundle):
     def __repr__(self):
         return str(self)
 
+
+class TrivialBundle(VectorBundle):
+    # A helper class to create trivial bundles of a given dimension.
+    def __init__(self, dim):
+        chern_ring = PolynomialRing(QQ, 'triv') # We need to have a base polynomial ring for consistency
+                                                # as a ring must have at least one generator we use triv to
+                                                # distinguish it - it should not appear in any chern classes!
+        #Chern classes of a trivial bundle all zero away from c_0 which like all bundles is 1
+        chern_classes = [chern_ring.one()] + [chern_ring.zero() for _ in xrange(dim)]
+        VectorBundle.__init__(self, str(dim), chern_classes)
+
+
 def exterior_power(n, p, algorithm="recursive",degree=None):
     #Returns the chern class of the pth exterior power of an n dimensional bundle E
     # in terms of the chern class of E
