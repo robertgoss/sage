@@ -115,8 +115,12 @@ class VectorBundle:
         #Compute new chern classes using whitney formula
         new_chern_classes = []
         #If this or the other bundle is truncated only truncate the resultant bundle to the minimum of these 2
-        if self.truncated or bundle.truncated:
+        if self.truncated and bundle.truncated:
             max_degree = min(self.truncation, bundle.truncation)
+        elif self.truncated:
+            max_degree = self.truncation
+        elif bundle.truncated:
+            max_degree = bundle.truncation
         else:
             max_degree = self.dim + bundle.dim
         for i in xrange(max_degree+1):
