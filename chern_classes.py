@@ -304,7 +304,7 @@ class TrivialBundle(VectorBundle):
                                                 # distinguish it - it should not appear in any chern classes!
         #Chern classes of a trivial bundle all zero away from c_0 which like all bundles is 1
         chern_classes = [chern_ring.one()] + [chern_ring.zero() for _ in xrange(dim)]
-        VectorBundle.__init__(self, str(dim), chern_classes)
+        VectorBundle.__init__(self, str(dim), dim, chern_classes)
 
 
 def exterior_power(n, p, algorithm="recursive",degree=None):
